@@ -19,7 +19,15 @@ if not os.path.exists(UPLOAD_DIR):
 app.config['UPLOAD_DIR'] = UPLOAD_DIR
 
 # function to make predictions
-
+def predict_image_type(img_filename):
+    img_width = 180
+    img_height = 180
+    image = img_filename
+    image = tf.keras.utils.load_img(image, target_size=(img_height,img_width))
+    img_arr = tf.keras.utils.array_to_img(image)
+    img_bat = tf.expand_dims(img_arr,0)
+    predict= model.predict(img_bat)
+    return predict
 
 # Routes
 @app.route('/')
@@ -54,6 +62,9 @@ def upload_image():
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_DIR'], filename)
         file.save(filepath)
+
+        # call the predict function
+        predict = predict_image_type(filename)
         # For demonstration, we just return the filename
 
         return f"Image uploaded: {file.filename}"
